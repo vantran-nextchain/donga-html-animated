@@ -14,6 +14,7 @@ const onWindowScroll = () => {
     const scrollDown = this.scrollY >= initialScroll;
     const scrollLimit = qty >= 1 && qty <= sectionsQty;
     // Verify that the scroll does not exceed the number of sections
+    console.log("scrollLimit", scrollLimit, qty, sectionsQty);
     if (scrollLimit) {
       body.style.overflowY = "hidden"; // Lock el scroll
       if (scrollDown && qty < sectionsQty) {
@@ -31,32 +32,33 @@ const onWindowScroll = () => {
         videoSticky = main.querySelector("#video-sticky");
         qty--;
       }
-    }
-    const unlockScroll = () => {
-      initialScroll = this.scrollY;
-      startFlag = true;
-      body.style.overflowY = "scroll";
-      console.log("un-locked");
-    };
-    const lockScroll = () => {
-      startFlag = false;
-      console.log("locked");
-    };
-    // Wait for the scrolling to finish to reset the values
-    if (videoSticky && !seenVideo) {
-      videoSticky.onended = () => {
-        seenVideo = true;
-        unlockScroll();
+
+      const unlockScroll = () => {
+        initialScroll = this.scrollY;
+        startFlag = true;
+        body.style.overflowY = "scroll";
+        console.log("un-locked");
       };
-    } else {
-      setTimeout(() => {
-        unlockScroll();
-      }, TIME_OUT);
+      const lockScroll = () => {
+        startFlag = false;
+        console.log("locked");
+      };
+      // Wait for the scrolling to finish to reset the values
+      if (videoSticky && !seenVideo) {
+        videoSticky.onended = () => {
+          seenVideo = true;
+          unlockScroll();
+        };
+      } else {
+        setTimeout(() => {
+          unlockScroll();
+        }, TIME_OUT);
+      }
+      lockScroll();
     }
-    lockScroll();
   }
-  // Keep scrollbar in the middle of the viewport
-  window.scroll(0, window.screen.height);
+  // // Keep scrollbar in the middle of the viewport
+  // window.scroll(0, window.screen.height);
 };
 setTimeout(() => {
   window.onscroll = onWindowScroll;

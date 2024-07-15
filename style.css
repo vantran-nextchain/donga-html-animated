@@ -46,7 +46,7 @@ header {
 }
 main.layout {
   width: 100%;
-  height: calc(100vh * 3);
+  height: calc(100vh * 2);
   position: relative;
 }
 main.layout section {
@@ -80,14 +80,14 @@ main.layout .s3 {
   background-color: #171716;
   z-index: 2;
 }
-main.layout .s4 {
-  background-color: #154621;
-  z-index: 1;
-}
 main.layout section.s-video {
   display: flex;
   flex-direction: column;
   gap: 40px;
+}
+.normal-content-container {
+  height: 100vh;
+  overflow-y: scroll;
 }
 /*** RESPONSIVE ***/
 /* MOBILE */

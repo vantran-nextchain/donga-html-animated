@@ -1,7 +1,9 @@
 const TIME_OUT = 600;
 const VIDEO_DURATION = 11;
 const TIMELINE_POINTS = [0, 3, 7, VIDEO_DURATION]; // timeline of animations
-const TIMELINE_POINTS_REVERSE = [VIDEO_DURATION, 8, 4, 0]; // timeline of animations
+const TIMELINE_POINTS_REVERSE = TIMELINE_POINTS.map(
+  (time) => VIDEO_DURATION - time
+); // timeline of animations
 
 HTMLVideoElement.prototype.playReverse = function (onended) {
   this.pause();
@@ -27,75 +29,66 @@ let qty = 1,
   next = null,
   videoEle = null,
   videoSecondPoint = 1,
-  videoPlaying = false,
-  reverse = false;
+  videoPlaying = false;
 let touchStart = 0;
 
 const onWindowScroll = () => {
-  const unlockScroll = () => {
-    initialScroll = this.scrollY;
-    startFlag = true;
-    body.style.overflowY = "scroll";
-    console.log("un-locked");
-  };
-  const lockScroll = () => {
-    startFlag = false;
-    console.log("locked");
-  };
-
-  const scrollDown = this.scrollY >= initialScroll;
-  const scrollLimit = qty >= 1 && qty <= sectionsQty;
-
   if (startFlag) {
-    if (!scrollLimit) return;
+    const unlockScroll = () => {
+      initialScroll = this.scrollY;
+      startFlag = true;
+      body.style.overflowY = "scroll";
+      console.log("un-locked");
+    };
 
-    body.style.overflowY = "hidden"; // Lock el scroll
-    if (scrollDown && qty < sectionsQty) {
-      reverse = false;
-      main = document.querySelector(`section.s${qty}`);
-      next = document.querySelector(`section.s${qty + 1}`);
-      main.style.transform = "translateY(-100vh)";
-      next.style.transform = "translateY(0)";
-      videoEle = next.querySelector("#video-sticky");
-      if (videoEle) {
-        setTimeout(() => {
-          videoPlaying = true;
+    const scrollDown = this.scrollY >= initialScroll;
+    const scrollLimit = qty >= 1 && qty <= sectionsQty;
+
+    if (scrollLimit) {
+      body.style.overflowY = "hidden"; // Lock el scroll
+      if (scrollDown && qty < sectionsQty) {
+        main = document.querySelector(`section.s${qty}`);
+        next = document.querySelector(`section.s${qty + 1}`);
+        main.style.transform = "translateY(-100vh)";
+        next.style.transform = "translateY(0)";
+        videoEle = next.querySelector("#video-sticky");
+        if (videoEle) {
+          setTimeout(() => {
+            videoPlaying = true;
+          }, 400);
           videoEle.play();
-        }, 400);
-        videoEle.onended = () => {
-          videoPlaying = false;
-          unlockScroll();
-        };
-      } else {
-        setTimeout(() => {
-          unlockScroll();
-        }, TIME_OUT);
-      }
-      qty++;
-    } else if (!scrollDown && qty > 1) {
-      reverse = true;
-      main = document.querySelector(`section.s${qty - 1}`);
-      next = document.querySelector(`section.s${qty}`);
-      main.style.transform = "translateY(0)";
-      next.style.transform = "translateY(100vh)";
-      videoEle = main.querySelector("#video-sticky");
-      if (videoEle) {
-        setTimeout(() => {
-          videoPlaying = true;
+          videoEle.onended = () => {
+            videoPlaying = false;
+            unlockScroll();
+          };
+        }
+        qty++;
+      } else if (!scrollDown && qty > 1) {
+        main = document.querySelector(`section.s${qty - 1}`);
+        next = document.querySelector(`section.s${qty}`);
+        main.style.transform = "translateY(0)";
+        next.style.transform = "translateY(100vh)";
+        videoEle = main.querySelector("#video-sticky");
+        if (videoEle) {
+          setTimeout(() => {
+            videoPlaying = true;
+          }, 400);
           videoEle.playReverse(() => {
             videoPlaying = false;
             unlockScroll();
           });
-        }, 400);
-      } else {
-        setTimeout(() => {
-          unlockScroll();
-        }, TIME_OUT);
+        }
+        qty--;
       }
-      qty--;
     }
 
-    lockScroll();
+    if (!videoEle) {
+      setTimeout(() => {
+        unlockScroll();
+      }, TIME_OUT);
+    }
+    startFlag = false;
+    console.log("locked");
   }
 };
 
